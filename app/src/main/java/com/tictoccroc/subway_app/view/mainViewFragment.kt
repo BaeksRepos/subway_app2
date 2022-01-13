@@ -1,14 +1,21 @@
 package com.tictoccroc.subway_app.view
 
+import android.drm.DrmConvertedStatus
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.Navigation
-import com.tictoccroc.subway_app.R
+import androidx.recyclerview.widget.GridLayoutManager
+import com.tictoccroc.subway_app.Converters
+import com.tictoccroc.subway_app.adapter.ResultAdapter
+import com.tictoccroc.subway_app.database.BaseDatabase
 import com.tictoccroc.subway_app.databinding.FragmentMainViewBinding
+import com.tictoccroc.subway_app.entitiy.SubwayDAO
 import com.tictoccroc.subway_app.listener.SubwaySearchClickListener
+import com.tictoccroc.subway_app.model.SubwayLine
+import com.tictoccroc.subway_app.model.SubwayStation
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -22,16 +29,26 @@ private const val ARG_PARAM2 = "param2"
  */
 class mainViewFragment : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var param1: String? = null;
+    private var param2: String? = null;
     private var fragmentBinding:FragmentMainViewBinding? = null;
+
+    private var lines:ArrayList<SubwayLine> = ArrayList<SubwayLine>();
+
+    private val totalStationList = ArrayList<SubwayStation>();
+
+    private  var subwayDAO: SubwayDAO? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            param1 = "station"
+            param2 = "lines"
         }
+
+        val database = BaseDatabase.createRoomDatabase(requireContext());
+
+        subwayDAO = database!!.subwayDAO();
     }
 
     override fun onCreateView(
@@ -69,7 +86,25 @@ class mainViewFragment : Fragment() {
         val navSubwayFrag = Navigation.findNavController(view);
         val btnSearch = fragmentBinding!!.cvSearch;
 
-        btnSearch.setOnClickListener(SubwaySearchClickListener(navSubwayFrag));
 
+        val stationList = subwayDAO!!.getSubwayStations();
+
+        stationList.forEach{
+            val stationLine = Converters().jsonToArrayLit(it.lines);
+            val subwayStation = SubwayStation(it.idx, it.name, stationLine as ArrayList<Int>)
+            totalStationList.add(subwayStation)
+        }
+
+
+        val linesList = Converters().jsonToLineList(subwayDAO!!.getSubwayLines()[0].lineJson) as ArrayList<SubwayLine>
+
+
+        val recyclerView = fragmentBinding!!.recyclerResults;
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 3);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.adapter = ResultAdapter(requireContext(), totalStationList, linesList);
+
+
+        btnSearch.setOnClickListener(SubwaySearchClickListener(navSubwayFrag));
     }
 }

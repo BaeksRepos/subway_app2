@@ -15,5 +15,9 @@
     <fragment
         android:id="@+id/searchViewFragment"
         android:name="com.tictoccroc.subway_app.view.searchViewFragment"
-        android:label="searchViewFragment" />
+        android:label="searchViewFragment" >
+        <action
+            android:id="@+id/action_searchViewFragment_to_mainViewFragment"
+            app:destination="@id/mainViewFragment" />
+    </fragment>
 </navigation>

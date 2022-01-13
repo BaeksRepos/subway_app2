@@ -8,10 +8,13 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tictoccroc.subway_app.R
 import com.tictoccroc.subway_app.adapter.SubwayAdapter
+import com.tictoccroc.subway_app.database.BaseDatabase
 import com.tictoccroc.subway_app.databinding.FragmentSearchViewBinding
+import com.tictoccroc.subway_app.entitiy.SubwayDAO
+import com.tictoccroc.subway_app.listener.KeywordFilterListener
 import com.tictoccroc.subway_app.listener.KeywordRemoveListener
+import com.tictoccroc.subway_app.listener.SearchClickListstener
 import com.tictoccroc.subway_app.repository.SubwayRepository
 import com.tictoccroc.subway_app.viewModel.SubwayViewModel
 import com.tictoccroc.subway_app.viewModelFactory.SubwayViewModelFactory
@@ -32,12 +35,18 @@ class searchViewFragment : Fragment() {
     private var param2: String? = null
     private var fragmentBinding:FragmentSearchViewBinding? = null;
 
+    private  var subwayDAO: SubwayDAO? = null;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+        val database = BaseDatabase.createRoomDatabase(requireContext());
+
+        subwayDAO = database!!.subwayDAO();
     }
 
     override fun onCreateView(
@@ -72,7 +81,7 @@ class searchViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModelFactory = SubwayViewModelFactory(SubwayRepository());
+        val viewModelFactory = SubwayViewModelFactory(SubwayRepository(requireContext()));
         val viewModel = ViewModelProvider(this, viewModelFactory).get(SubwayViewModel::class.java);
 
         val recyclerView = fragmentBinding!!.rvSubwayList;
@@ -91,10 +100,12 @@ class searchViewFragment : Fragment() {
         viewModel.subwayLiveData.observe(viewLifecycleOwner, Observer {
            subway -> subway?.let {
                 val viewAdapter = SubwayAdapter(requireContext(), it);
+                viewAdapter.setStationListClickListener(SearchClickListstener(view, subwayDAO!!));
                 recyclerView.adapter = viewAdapter;
+                editKeyword.addTextChangedListener(KeywordFilterListener(viewAdapter, editKeyword.text.toString()))
             }
         });
-
-
     }
+
+
 }

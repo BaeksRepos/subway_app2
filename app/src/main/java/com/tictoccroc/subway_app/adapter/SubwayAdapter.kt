@@ -3,28 +3,30 @@ package com.tictoccroc.subway_app.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.tictoccroc.subway_app.databinding.SubwaySearchItemBinding
+import com.tictoccroc.subway_app.listener.StationListClickListener
 import com.tictoccroc.subway_app.model.Subway
 import com.tictoccroc.subway_app.model.SubwayLine
 import com.tictoccroc.subway_app.model.SubwayStation
 import com.tictoccroc.subway_app.viewholder.SubwayViewHolder
 
-class SubwayAdapter(context: Context, subwayList: Subway) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SubwayAdapter(context: Context, subwayList: Subway) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
     private val _subwayList:Subway = subwayList;
-    private val stations = _subwayList.subway_stations
+    private var stations = _subwayList.subway_stations
     private val lines = _subwayList.subway_lines;
     private val context = context
+
 
     override fun getItemCount(): Int {
        return stations.size;
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val binding = SubwaySearchItemBinding.inflate(LayoutInflater.from(parent.context), parent, false);
-        return SubwayViewHolder(binding, lines);
+        val fragmentBinding = SubwaySearchItemBinding.inflate(LayoutInflater.from(parent.context), parent, false);
+        return SubwayViewHolder(fragmentBinding, lines);
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -32,7 +34,48 @@ class SubwayAdapter(context: Context, subwayList: Subway) : RecyclerView.Adapter
 
         if(holder is SubwayViewHolder){
             holder.bind(context,item);
+            holder.itemView.setOnClickListener{
+                stationListClickListener.onStationListClick(item, position, lines);
+            }
+        }
+    }
+
+    override fun getFilter(): Filter? {
+        return FilterClass();
+    }
+
+    private lateinit var stationListClickListener:StationListClickListener
+
+    fun setStationListClickListener(clickListener:StationListClickListener){
+        this.stationListClickListener = clickListener;
+    }
+
+    inner class FilterClass : Filter(){
+        override fun performFiltering(p0: CharSequence?): FilterResults {
+            val keyword = p0.toString();
+
+            //resultFilterList
+            if(keyword.equals(""))
+                stations = _subwayList.subway_stations;
+            else{
+                val filterList = ArrayList<SubwayStation>();
+                if(_subwayList.subway_stations != null){
+                    _subwayList.subway_stations.forEach{
+                        if(it.name.contains(keyword))
+                            filterList.add(it);
+                    }
+                    stations = filterList;
+                }
+            }
+
+            val filterResults = FilterResults();
+            filterResults.values = stations;
+            return filterResults;
         }
 
+        override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
+            stations = p1!!.values as ArrayList<SubwayStation>;
+            notifyDataSetChanged();
+        }
     }
 }
