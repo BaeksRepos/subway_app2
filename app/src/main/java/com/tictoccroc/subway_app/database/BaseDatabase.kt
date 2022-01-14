@@ -10,7 +10,7 @@ import com.tictoccroc.subway_app.entitiy.SubwayLineEntity
 import com.tictoccroc.subway_app.entitiy.SubwayStationEntity
 
 
-@androidx.room.Database(entities = [SubwayStationEntity::class, SubwayLineEntity::class], version = 3, exportSchema = false)
+@androidx.room.Database(entities = [SubwayStationEntity::class, SubwayLineEntity::class], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class BaseDatabase : RoomDatabase() {
 

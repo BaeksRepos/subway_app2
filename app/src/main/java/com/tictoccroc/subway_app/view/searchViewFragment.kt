@@ -92,8 +92,8 @@ class searchViewFragment : Fragment() {
         val removeKeyword = fragmentBinding!!.removeKeyword;
         val editKeyword = fragmentBinding!!.editKeyword;
 
+        // 키워드 입력 후 옆에 X 누를 경우 텍스트 지움
         removeKeyword.setOnClickListener(KeywordRemoveListener(editKeyword));
-
 
         viewModel.requestSearchSubway();
 
@@ -106,6 +106,4 @@ class searchViewFragment : Fragment() {
             }
         });
     }
-
-
 }

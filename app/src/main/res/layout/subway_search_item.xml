@@ -8,12 +8,6 @@
     android:weightSum="10"
     android:orientation="horizontal">
 
-<!--    <TextView-->
-<!--        android:layout_weight="9"-->
-<!--        android:text="1111"-->
-<!--        android:id="@+id/station_name"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"/>-->
 
 
 </LinearLayout>

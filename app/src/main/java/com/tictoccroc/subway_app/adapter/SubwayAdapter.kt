@@ -40,16 +40,18 @@ class SubwayAdapter(context: Context, subwayList: Subway) : RecyclerView.Adapter
         }
     }
 
-    override fun getFilter(): Filter? {
-        return FilterClass();
-    }
-
+    // 검색된 역 리스트 클릭 리스너
     private lateinit var stationListClickListener:StationListClickListener
 
     fun setStationListClickListener(clickListener:StationListClickListener){
         this.stationListClickListener = clickListener;
     }
 
+    // 검색정보 키워드입력에 따른 필터링 기능
+    override fun getFilter(): Filter? {
+        return FilterClass();
+    }
+    
     inner class FilterClass : Filter(){
         override fun performFiltering(p0: CharSequence?): FilterResults {
             val keyword = p0.toString();

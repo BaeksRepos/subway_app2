@@ -9,5 +9,6 @@ data class SubwayStationEntity(
     @PrimaryKey
     val idx:Int,
     val name:String,
-    val lines:String
+    val lines:String,
+    val useYn:String
 )

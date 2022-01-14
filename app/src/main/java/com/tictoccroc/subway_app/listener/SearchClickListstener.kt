@@ -18,11 +18,10 @@ class SearchClickListstener(view: View, subwayDAO: SubwayDAO) : StationListClick
     override fun onStationListClick(item: SubwayStation,   position: Int,  lines: ArrayList<SubwayLine>) {
         Thread{
             val jsonStr = Converters().arrayListToJson(item.subwayLines);
-            val station = SubwayStationEntity(item.idx, item.name, jsonStr);
+            val station = SubwayStationEntity(item.idx, item.name, jsonStr, "Y");
 
             val listStr = Converters().lineListToJson(lines);
             val line = SubwayLineEntity(1, listStr);
-
 
             _subwayDAO.addSubwayStation(station)
             _subwayDAO.addSubwayLine(line);
